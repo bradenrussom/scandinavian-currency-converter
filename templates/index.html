@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USD to Scandinavian Currencies Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .rates-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .rates-table th,
+        .rates-table td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .rates-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .rates-table tr:hover {
+            background-color: #f8f9ff;
+        }
+
+        .rates-table td {
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .flag {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        .converter-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .converter-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 1.1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .convert-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-weight: 600;
+        }
+
+        .convert-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .results {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-currency {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .result-amount {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #ffeaea;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 20px;
+        }
+
+        .refresh-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #218838;
+        }
+
+        .reverse-converter {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.2);
+        }
+
+        .reverse-converter h2 {
+            margin-bottom: 20px;
+            font-size: 1.6em;
+            text-align: center;
+        }
+
+        .reverse-input-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .currency-selector,
+        .amount-input {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .convert-button {
+            flex-shrink: 0;
+        }
+
+        .currency-selector label,
+        .amount-input label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .currency-selector select,
+        .amount-input input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            font-size: 1em;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+        }
+
+        .currency-selector select:focus,
+        .amount-input input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+        }
+
+        .reverse-convert-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 12px 20px;
+            font-size: 1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .reverse-convert-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .reverse-results {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .reverse-result-display {
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: 700;
+            color: white;
+        }
+
+        .reverse-result-breakdown {
+            text-align: center;
+            margin-top: 10px;
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        @media (max-width: 768px) {
+            .reverse-input-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .currency-selector,
+            .amount-input,
+            .convert-button {
+                flex: none;
+                width: 100%;
+            }
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .rates-table th,
+            .rates-table td {
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💱 USD to Scandinavian Currencies</h1>
+        
+        {% if error %}
+            <div class="error">
+                <strong>Error:</strong> {{ error }}
+            </div>
+        {% endif %}
+        
+        <!-- Reverse Conversion Widget -->
+        <div class="reverse-converter">
+            <h2>🔄 Convert to USD</h2>
+            <div class="reverse-input-row">
+                <div class="currency-selector">
+                    <label for="fromCurrency">From:</label>
+                    <select id="fromCurrency" onchange="saveUserPreference()">
+                        <option value="SEK">🇸🇪 Swedish Krona (SEK)</option>
+                        <option value="DKK">🇩🇰 Danish Krone (DKK)</option>
+                        <option value="NOK">🇳🇴 Norwegian Krone (NOK)</option>
+                    </select>
+                </div>
+                <div class="amount-input">
+                    <label for="reverseAmount">Amount:</label>
+                    <input type="number" id="reverseAmount" step="0.01" min="0" placeholder="Enter amount">
+                </div>
+                <div class="convert-button">
+                    <button class="convert-btn reverse-convert-btn" onclick="convertToUSD()">Convert to USD</button>
+                </div>
+            </div>
+            <div id="reverseResults" class="reverse-results" style="display: none;"></div>
+        </div>
+        
+        {% if rates %}
+            <table class="rates-table">
+                <thead>
+                    <tr>
+                        <th>Currency</th>
+                        <th>Rate (per 1 USD)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="flag">🇸🇪</span>Swedish Krona (SEK)</td>
+                        <td>{{ rates.SEK }} SEK</td>
+                    </tr>
+                    <tr>
+                        <td><span class="flag">🇩🇰</span>Danish Krone (DKK)</td>
+                        <td>{{ rates.DKK }} DKK</td>
+                    </tr>
+                    <tr>
+                        <td><span class="flag">🇳🇴</span>Norwegian Krone (NOK)</td>
+                        <td>{{ rates.NOK }} NOK</td>
+                    </tr>
+                </tbody>
+            </table>
+        {% endif %}
+        
+        <div class="converter-section">
+            <h2>Convert USD</h2>
+            <div class="input-group">
+                <label for="amount">Amount in USD ($)</label>
+                <input type="number" id="amount" step="0.01" min="0" placeholder="Enter amount in USD">
+            </div>
+            <button class="convert-btn" onclick="convertCurrency()">Convert</button>
+            
+            <div id="results" class="results" style="display: none;"></div>
+        </div>
+        
+        <div class="last-updated">
+            {% if last_updated %}
+                Last updated: {{ last_updated }}
+                <button class="refresh-btn" onclick="refreshRates()">Refresh Rates</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Load user preference for currency selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedCurrency = localStorage.getItem('preferredCurrency');
+            if (savedCurrency) {
+                document.getElementById('fromCurrency').value = savedCurrency;
+            }
+        });
+
+        // Save user's currency preference
+        function saveUserPreference() {
+            const selectedCurrency = document.getElementById('fromCurrency').value;
+            localStorage.setItem('preferredCurrency', selectedCurrency);
+        }
+
+        // Convert from Scandinavian currency to USD
+        async function convertToUSD() {
+            const amount = document.getElementById('reverseAmount').value;
+            const fromCurrency = document.getElementById('fromCurrency').value;
+            const resultsDiv = document.getElementById('reverseResults');
+            
+            if (!amount || amount <= 0) {
+                showReverseError('Please enter a valid amount greater than 0');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/convert_to_usd', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: parseFloat(amount),
+                        from_currency: fromCurrency
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayReverseResults(data);
+                } else {
+                    showReverseError(data.error);
+                }
+            } catch (error) {
+                showReverseError('Failed to convert currency. Please try again.');
+            }
+        }
+
+        function displayReverseResults(data) {
+            const resultsDiv = document.getElementById('reverseResults');
+            const currencyFlags = {
+                'SEK': '🇸🇪',
+                'DKK': '🇩🇰',
+                'NOK': '🇳🇴'
+            };
+            
+            const currencyNames = {
+                'SEK': 'Swedish Krona',
+                'DKK': 'Danish Krone',
+                'NOK': 'Norwegian Krone'
+            };
+            
+            const html = `
+                <div class="reverse-result-display">
+                    ${currencyFlags[data.from_currency]} ${data.original_amount} ${data.from_currency} = ${data.usd_amount} USD 💵
+                </div>
+                <div class="reverse-result-breakdown">
+                    ${data.original_amount} ${currencyNames[data.from_currency]} converts to ${data.usd_amount} US Dollars
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+            resultsDiv.style.display = 'block';
+        }
+
+        function showReverseError(message) {
+            const resultsDiv = document.getElementById('reverseResults');
+            resultsDiv.innerHTML = `<div style="color: #ffebee; background: rgba(244, 67, 54, 0.2); padding: 15px; border-radius: 8px; border: 1px solid rgba(244, 67, 54, 0.3);">${message}</div>`;
+            resultsDiv.style.display = 'block';
+        }
+
+        // Original USD conversion function
+        async function convertCurrency() {
+            const amount = document.getElementById('amount').value;
+            const resultsDiv = document.getElementById('results');
+            
+            if (!amount || amount <= 0) {
+                showError('Please enter a valid amount greater than 0');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/convert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({amount: parseFloat(amount)})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data.results, amount);
+                } else {
+                    showError(data.error);
+                }
+            } catch (error) {
+                showError('Failed to convert currency. Please try again.');
+            }
+        }
+        
+        function displayResults(results, originalAmount) {
+            const resultsDiv = document.getElementById('results');
+            const currencyNames = {
+                'SEK': '🇸🇪 Swedish Krona',
+                'DKK': '🇩🇰 Danish Krone',
+                'NOK': '🇳🇴 Norwegian Krone'
+            };
+            
+            let html = `<h3>${originalAmount} USD equals:</h3>`;
+            
+            for (const [currency, amount] of Object.entries(results)) {
+                html += `
+                    <div class="result-item">
+                        <span class="result-currency">${currencyNames[currency]}</span>
+                        <span class="result-amount">${amount} ${currency}</span>
+                    </div>
+                `;
+            }
+            
+            resultsDiv.innerHTML = html;
+            resultsDiv.style.display = 'block';
+        }
+        
+        function showError(message) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `<div class="error">${message}</div>`;
+            resultsDiv.style.display = 'block';
+        }
+        
+        async function refreshRates() {
+            const refreshBtn = document.querySelector('.refresh-btn');
+            const originalText = refreshBtn.textContent;
+            
+            refreshBtn.textContent = 'Refreshing...';
+            refreshBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/refresh', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update the rates table
+                    location.reload();
+                } else {
+                    alert('Failed to refresh rates: ' + data.error);
+                }
+            } catch (error) {
+                alert('Failed to refresh rates. Please try again.');
+            } finally {
+                refreshBtn.textContent = originalText;
+                refreshBtn.disabled = false;
+            }
+        }
+        
+        // Allow Enter key to trigger conversion for both inputs
+        document.getElementById('amount').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                convertCurrency();
+            }
+        });
+
+        document.getElementById('reverseAmount').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                convertToUSD();
+            }
+        });
+    </script>
+</body>
+</html>
