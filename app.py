@@ -11,7 +11,7 @@ class CurrencyConverter:
     def __init__(self):
         self.rates_file = 'exchange_rates.json'
         self.api_url = 'https://api.exchangerate-api.com/v4/latest/USD'
-        self.currencies = ['SEK', 'DKK', 'NOK']  # Swedish, Danish, Norwegian Krone
+        self.currencies = ['DKK', 'SEK', 'NOK']  # Danish, Swedish, Norwegian Krone
         
     def get_stored_rates(self) -> Optional[Dict]:
         """Load rates from file if they exist and are from today"""
